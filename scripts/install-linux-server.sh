@@ -42,3 +42,20 @@ else
     echo -e "${BLUE}ℹ️ Nomad configuration file already exists, skipping creation...${NC}"
 fi
 
+# Now start nomad as a service
+sudo systemctl enable nomad
+sudo systemctl start nomad
+
+# verify nomad is running
+if systemctl is-active --quiet nomad; then
+    echo -e "${GREEN}✅ Nomad is running.${NC}"
+    echo -e "For node information, you can run: ${GREEN}nomad node status${NC}"
+    echo -e "For job information, you can run: ${GREEN}nomad job status${NC}"
+    echo -e "For allocation information, you can run: ${GREEN}nomad alloc status${NC}"
+    echo -e "local server is running at: ${GREEN}The Nomad UI will be available at http://localhost:4646${NC}"
+else
+    echo -e "${RED}❌ Nomad is not running.${NC}"
+    echo -e "Something went wrong, you might want to check the logs."
+    echo -e "You can check the logs by running: ${GREEN}journalctl -u nomad${NC}"
+fi
+
