@@ -26,11 +26,11 @@ you can do this remotely as well.
 
 Linux:
 
-    curl -s https://raw.githubusercontent.com/nycynik/home-cluster/main/scripts/install-linux-server.sh | bash
+     /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/nycynik/home-cluster/main/scripts/install-linux-server.sh)"
 
 MacOS:
 
-    curl -s https://raw.githubusercontent.com/nycynik/home-cluster/main/scripts/install-osx-server.sh | bash
+    /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/nycynik/home-cluster/main/scripts/install-osx-server.sh)"
  
 
 
