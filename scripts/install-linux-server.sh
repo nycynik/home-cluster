@@ -22,21 +22,101 @@ echo -e "2) Client"
 echo -e "3) Both"
 read -p "Enter your choice (1/2/3): " choice
 
+# it's a bit long winded, but it's easier to maintain to have the configs
+# in variables instead of separate files. This next block is just the three
+# different configurations for the three different choices.
 case $choice in
     1)
-        CONFIG_FILE="./configs/nomad-server.hcl"
+        CONFIG_CONTENT=$(cat <<EOF
+data_dir = "/opt/nomad/data"
+bind_addr = "0.0.0.0"
+
+# Server configuration
+server {
+  enabled = true
+  bootstrap_expect = 1  # Since this is a single server setup
+}
+
+# Networking configuration
+ports {
+  http = 4646
+  rpc  = 4647
+  serf = 4648
+}
+EOF
+)
         ;;
     2)
-        CONFIG_FILE="./configs/nomad-client.hcl"
+        CONFIG_CONTENT=$(cat <<EOF
+data_dir = "/opt/nomad/data"
+bind_addr = "0.0.0.0"
+
+# Client configuration
+client {
+  enabled = true
+  servers = ["127.0.0.1:4647"]  # Local server address
+  
+  # Enable Docker driver
+  options = {
+    "driver.raw_exec.enable" = "1"
+    "docker.privileged.enabled" = "true"
+  }
+}
+
+# Enable Docker driver globally
+plugin "docker" {
+  config {
+    allow_privileged = true
+  }
+}
+EOF
+)
         ;;
     3)
-        CONFIG_FILE="./configs/nomad-both.hcl"
+        CONFIG_CONTENT=$(cat <<EOF
+data_dir = "/opt/nomad/data"
+bind_addr = "0.0.0.0"
+
+# Server configuration
+server {
+  enabled = true
+  bootstrap_expect = 1  # Since this is a single server setup
+}
+
+# Client configuration
+client {
+  enabled = true
+  servers = ["127.0.0.1:4647"]  # Local server address
+  
+  # Enable Docker driver
+  options = {
+    "driver.raw_exec.enable" = "1"
+    "docker.privileged.enabled" = "true"
+  }
+}
+
+# Networking configuration
+ports {
+  http = 4646
+  rpc  = 4647
+  serf = 4648
+}
+
+# Enable Docker driver globally
+plugin "docker" {
+  config {
+    allow_privileged = true
+  }
+}
+EOF
+)
         ;;
     *)
         echo -e "${RED}Invalid choice. Exiting...${NC}"
         exit 1
         ;;
 esac
+
 
 # ====================================
 # Download and install Nomad
@@ -83,3 +163,6 @@ else
     echo -e "Something went wrong, you might want to check the logs."
     echo -e "You can check the logs by running: ${GREEN}journalctl -u nomad${NC}"
 fi
+
+echo -e "${GREEN}🎉 Installation complete!${NC}"
+ 
