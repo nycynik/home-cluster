@@ -14,6 +14,31 @@ BLUE='\e[34m'
 NC='\e[0m' # No Color
 
 # ====================================
+# Ask user for installation type
+# ====================================
+echo -e "${YELLOW}Please select the installation type:${NC}"
+echo -e "1) Server"
+echo -e "2) Client"
+echo -e "3) Both"
+read -p "Enter your choice (1/2/3): " choice
+
+case $choice in
+    1)
+        CONFIG_FILE="./configs/nomad-server.hcl"
+        ;;
+    2)
+        CONFIG_FILE="./configs/nomad-client.hcl"
+        ;;
+    3)
+        CONFIG_FILE="./configs/nomad-both.hcl"
+        ;;
+    *)
+        echo -e "${RED}Invalid choice. Exiting...${NC}"
+        exit 1
+        ;;
+esac
+
+# ====================================
 # Download and install Nomad
 # ====================================
 # install nomad
@@ -36,7 +61,7 @@ sudo chmod 700 /etc/nomad.d
 
 # create configuration file if it does not exist
 if [ ! -f /etc/nomad.d/nomad.hcl ]; then
-    sudo cat ./configs/nomad-template.hcl >> /etc/nomad.d/nomad.hcl
+    sudo cat $CONFIG_FILE >> /etc/nomad.d/nomad.hcl
     echo -e "${GREEN}✅ Nomad configuration file created.${NC}"
 else
     echo -e "${BLUE}ℹ️ Nomad configuration file already exists, skipping creation...${NC}"
@@ -58,4 +83,3 @@ else
     echo -e "Something went wrong, you might want to check the logs."
     echo -e "You can check the logs by running: ${GREEN}journalctl -u nomad${NC}"
 fi
-
